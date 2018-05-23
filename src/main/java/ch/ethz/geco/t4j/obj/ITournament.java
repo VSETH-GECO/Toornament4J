@@ -31,70 +31,70 @@ public interface ITournament extends Identifiable, Closable {
     /**
      * Gets the full name of the tournament.
      *
-     * @return the full name of the tournament.
+     * @return The full name of the tournament.
      */
     Optional<String> getFullName();
 
     /**
      * Gets the discipline of the tournament.
      *
-     * @return the discipline of the tournament.
+     * @return The discipline of the tournament.
      */
     IDiscipline getDiscipline();
 
     /**
      * Gets the status of the tournament.
      *
-     * @return the status of the tournament.
+     * @return The status of the tournament.
      */
     Status getStatus();
 
     /**
      * Gets the local start date of the tournament.
      *
-     * @return the start date of the tournament.
+     * @return The start date of the tournament.
      */
     Optional<LocalDate> getStartDate();
 
     /**
      * Gets the local end date of the tournament.
      *
-     * @return the end date of the tournament.
+     * @return The end date of the tournament.
      */
     Optional<LocalDate> getEndDate();
 
     /**
      * Gets the time zone of the tournament.
      *
-     * @return the time zone of the tournament.
+     * @return The time zone of the tournament.
      */
     Optional<ZoneId> getTimezone();
 
     /**
      * Returns whether the tournament is published or not.
      *
-     * @return whether the tournament is published or not.
+     * @return Whether the tournament is published or not.
      */
     Boolean isPublic();
 
     /**
      * Gets the size of the tournament.
      *
-     * @return the size of the tournament.
+     * @return The size of the tournament.
      */
     Integer getSize();
 
     /**
      * Returns whether the tournament is team vs. team or player vs. player.
      *
-     * @return true if a team consists of only one player, false otherwise.
+     * @return True if a team consists of only one player, false otherwise.
      */
-    Boolean isSingleplayer();
+    Optional<Boolean> isSingleplayer();
 
     /**
      * Returns whether the tournament is online or local.
      *
-     * @return true if the tournament is played on the internet, false if local.
+     * @return True if the tournament is played on the internet, false if local.
      */
     Boolean isOnline();
 
@@ -109,86 +109,106 @@ public interface ITournament extends Identifiable, Closable {
     /**
      * Gets the country where the tournament is held.
      *
-     * @return the country of the tournament.
+     * @return The country of the tournament.
      */
     Optional<String> getCountry();
 
     /**
      * Gets the name of the tournament organizer whether it is an individual, group, association or company.
      *
-     * @return the name of the organizer.
+     * @return The name of the organizer.
      */
     Optional<String> getOrganization();
 
     /**
      * Gets the email address to contact the tournament organizer.
      *
-     * @return the organizer email address.
+     * @return The organizer email address.
      */
-    String getContactEmail();
+    Optional<String> getContactEmail();
 
     /**
      * Gets the Discord URL of the tournament organizer.
      *
-     * @return the Discord URL of the organizer.
+     * @return The Discord URL of the organizer.
      */
-    String getDiscordURL();
+    Optional<String> getDiscordURL();
 
     /**
      * Gets the website of the tournament or tournament organizer.
      *
-     * @return the tournament website.
+     * @return The tournament website.
      */
     Optional<String> getWebsite();
 
     /**
      * Gets the description of the tournament.
      *
-     * @return the tournament description.
+     * @return The tournament description.
      */
     Optional<String> getDescription();
 
     /**
      * Gets the rules of the tournament.
      *
-     * @return the tournament rules.
+     * @return The tournament rules.
      */
     Optional<String> getRules();
 
     /**
      * Gets the prize of the tournament.
      *
-     * @return the tournament prize.
+     * @return The tournament prize.
      */
     Optional<String> getPrize();
 
     /**
      * Gets the platforms on which the tournament can be played.
      *
-     * @return the supported platforms for this tournament.
+     * @return The supported platforms for this tournament.
      */
     Optional<List<String>> getPlatforms();
 
     /**
      * Gets all available logos for the tournament.
      *
-     * @return the tournament logos.
+     * @return The tournament logos.
      */
     Optional<Map<String, String>> getLogos();
 
     /**
      * Gets the time when the registration for the tournament opens.
      *
-     * @return the opening time of the tournament.
+     * @return The opening time of the tournament.
      */
     ZonedDateTime getOpeningTime();
 
     /**
      * Gets the time when the registration for the tournament closes.
      *
-     * @return the closing time of the tournament.
+     * @return The closing time of the tournament.
      */
     ZonedDateTime getClosingTime();
+
+    /**
+     * Gets a list of the custom fields of the tournament.
+     *
+     * @return The custom field of the tournament.
+     */
+    List<ICustomField> getCustomFields();
+
+    /**
+     * Gets a list of participants of the tournament.
+     *
+     * @return A list of participants.
+     */
+    List<IParticipant> getParticipants();
+
+    /**
+     * Gets a participant by its ID.
+     * @return
+     */
+    IParticipant getParticipantByID(Long participantID);
 
     /**
      * The status of a tournament.

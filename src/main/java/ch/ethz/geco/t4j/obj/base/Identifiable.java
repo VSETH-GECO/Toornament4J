@@ -6,7 +6,7 @@ public interface Identifiable {
      *
      * @return the unique ID of the object.
      */
-    String getID();
+    long getID();
 
     /**
      * Gets the name of the object.

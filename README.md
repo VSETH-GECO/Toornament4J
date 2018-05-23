@@ -1,4 +1,4 @@
-# Tournament4J
+# Toornament4J
 Java Interface for the official Toornament API.
 
 Currently heavily WIP, expect a working release Q3 2018.<br>
