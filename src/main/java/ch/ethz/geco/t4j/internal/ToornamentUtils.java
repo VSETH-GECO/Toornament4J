@@ -4,10 +4,9 @@ import ch.ethz.geco.t4j.Toornament4J;
 import ch.ethz.geco.t4j.impl.CustomField;
 import ch.ethz.geco.t4j.impl.Discipline;
 import ch.ethz.geco.t4j.impl.Tournament;
-import ch.ethz.geco.t4j.internal.json.objects.CustomFieldObject;
-import ch.ethz.geco.t4j.internal.json.objects.DisciplineObject;
-import ch.ethz.geco.t4j.internal.json.objects.ParticipantObject;
-import ch.ethz.geco.t4j.internal.json.objects.TournamentObject;
+import ch.ethz.geco.t4j.internal.auth.Scope;
+import ch.ethz.geco.t4j.internal.auth.Token;
+import ch.ethz.geco.t4j.internal.json.objects.*;
 import ch.ethz.geco.t4j.obj.ICustomField;
 import ch.ethz.geco.t4j.obj.IParticipant;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
@@ -21,6 +20,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ToornamentUtils {
     public static final ObjectMapper MAPPER = new ObjectMapper();
@@ -28,6 +29,34 @@ public class ToornamentUtils {
     // Use jackson afterburner
     static {
         MAPPER.registerModule(new AfterburnerModule());
+    }
+
+    /**
+     * Converts a token JSON object to a token object.
+     *
+     * @param tokenObject The token JSON object to convert.
+     * @return The converted token object.
+     */
+    public static Token getTokenFromJSON(TokenObject tokenObject) {
+        if (tokenObject == null) {
+            Toornament4J.LOGGER.warn(LogMarkers.UTIL, "Trying to convert null TokenObject.");
+            return null;
+        }
+
+        // Parse scope
+        Set<Scope> scopes = new HashSet<>();
+        if (tokenObject.scope != null) {
+            String[] scopeStrings = tokenObject.scope.split(" ");
+            try {
+                for (String scopeString : scopeStrings) {
+                    scopes.add(Scope.valueOf(scopeString.replace(":", "_").toUpperCase()));
+                }
+            } catch (IllegalArgumentException e) {
+                Toornament4J.LOGGER.warn(LogMarkers.UTIL, "Could not parse scope from JSON: {}", e.getMessage());
+            }
+        }
+
+        return new Token(tokenObject.access_token, tokenObject.token_type, scopes, tokenObject.expires_in);
     }
 
     /**

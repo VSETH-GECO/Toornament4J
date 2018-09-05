@@ -10,4 +10,6 @@ public class Endpoints {
     public static final String PARTICIPANT = BASE + "/participant/v2";
 
     public static final String ORGANIZER = BASE + "/organizer/v2";
+
+    public static final String CRED_AUTH = BASE + "/oauth/v2/token";
 }
