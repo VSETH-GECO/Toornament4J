@@ -6,7 +6,7 @@ import java.util.List;
  * Represents a discipline json object.
  */
 public class DisciplineObject {
-    public String id;
+    public long id;
     public String name;
     public String shortname;
     public String fullname;

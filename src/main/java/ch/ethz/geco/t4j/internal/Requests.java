@@ -45,6 +45,11 @@ public class Requests {
      */
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
 
+    /**
+     * Constructs a new Request holder.
+     *
+     * @param client The toornament client, can be null if no API key is needed.
+     */
     public Requests(IToornamentClient client) {
         POST = new Request(HttpPost.class, client);
         GET = new Request(HttpGet.class, client);

@@ -1,5 +1,6 @@
 package ch.ethz.geco.t4j.obj;
 
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Positionable;
 /**
  * A custom field contains additional information about some objects and can be set
@@ -7,7 +8,7 @@ import ch.ethz.geco.t4j.obj.base.Positionable;
  * <br>
  * A custom field may be associated to a player, a team or a team's player.
  */
-public interface ICustomField extends Positionable {
+public interface ICustomField extends IToornamentObject, Positionable {
     int MAX_LABEL_LENGTH = 255;
     int MAX_NAME_LENGTH = 255;
 

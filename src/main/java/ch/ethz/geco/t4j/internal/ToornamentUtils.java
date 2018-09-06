@@ -3,14 +3,12 @@ package ch.ethz.geco.t4j.internal;
 import ch.ethz.geco.t4j.Toornament4J;
 import ch.ethz.geco.t4j.impl.CustomField;
 import ch.ethz.geco.t4j.impl.Discipline;
+import ch.ethz.geco.t4j.impl.Playlist;
 import ch.ethz.geco.t4j.impl.Tournament;
 import ch.ethz.geco.t4j.internal.auth.Scope;
 import ch.ethz.geco.t4j.internal.auth.Token;
 import ch.ethz.geco.t4j.internal.json.objects.*;
-import ch.ethz.geco.t4j.obj.ICustomField;
-import ch.ethz.geco.t4j.obj.IParticipant;
-import ch.ethz.geco.t4j.obj.IToornamentClient;
-import ch.ethz.geco.t4j.obj.ITournament;
+import ch.ethz.geco.t4j.obj.*;
 import ch.ethz.geco.t4j.util.LogMarkers;
 import ch.ethz.geco.t4j.util.ToornamentException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,13 +63,13 @@ public class ToornamentUtils {
      * @param disciplineObject The discipline JSON object to convert.
      * @return The converted discipline object.
      */
-    public static Discipline getDisciplineFromJSON(DisciplineObject disciplineObject) {
+    public static Discipline getDisciplineFromJSON(IToornamentClient client, DisciplineObject disciplineObject) {
         if (disciplineObject == null) {
             Toornament4J.LOGGER.warn(LogMarkers.UTIL, "Trying to convert null DisciplineObject.");
             return null;
         }
 
-        return new Discipline(disciplineObject.id, disciplineObject.name, disciplineObject.shortname,
+        return new Discipline(client, disciplineObject.id, disciplineObject.name, disciplineObject.shortname,
                 disciplineObject.fullname, disciplineObject.copyrights, disciplineObject.platforms_available,
                 disciplineObject.team_size == null ? null : disciplineObject.team_size.min,
                 disciplineObject.team_size == null ? null : disciplineObject.team_size.max);
@@ -177,5 +175,21 @@ public class ToornamentUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Converts a {@link PlaylistObject} JSON object to a {@link Playlist} object.
+     *
+     * @param client         The client the playlist belongs to.
+     * @param playlistObject The playlist JSON object to convert.
+     * @return The converted playlist object.
+     */
+    public static IPlaylist getPlaylistFromJSON(IToornamentClient client, PlaylistObject playlistObject) {
+        if (playlistObject == null) {
+            Toornament4J.LOGGER.warn(LogMarkers.UTIL, "Trying to convert null PlaylistObject.");
+            return null;
+        }
+
+        return new Playlist(client, playlistObject.id, playlistObject.name, playlistObject.description);
     }
 }

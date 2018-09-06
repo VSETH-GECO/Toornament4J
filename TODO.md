@@ -31,8 +31,8 @@
 - [ ] GET   /tournaments/{tournament_id}/streams
 - [ ] GET   /tournaments/{tournament_id}/videos
 - [ ] GET   /tournaments/{tournament_id}/matches/{match_id}/videos
-- [ ] GET   /playlist/{id}
-- [ ] GET   /playlist/{id}/tournaments
+- [x] GET   /playlist/{id}
+- [x] GET   /playlist/{id}/tournaments
 
 #### Participant
 - [ ] GET   /tournaments/{id}

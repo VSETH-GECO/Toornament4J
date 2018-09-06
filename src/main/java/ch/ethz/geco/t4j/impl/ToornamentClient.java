@@ -5,8 +5,10 @@ import ch.ethz.geco.t4j.internal.FeaturedTournamentFilter;
 import ch.ethz.geco.t4j.internal.Requests;
 import ch.ethz.geco.t4j.internal.ToornamentUtils;
 import ch.ethz.geco.t4j.internal.json.objects.DisciplineObject;
+import ch.ethz.geco.t4j.internal.json.objects.PlaylistObject;
 import ch.ethz.geco.t4j.internal.json.objects.TournamentObject;
 import ch.ethz.geco.t4j.obj.IDiscipline;
+import ch.ethz.geco.t4j.obj.IPlaylist;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
 import ch.ethz.geco.t4j.obj.ITournament;
 import ch.ethz.geco.t4j.util.ToornamentException;
@@ -90,14 +92,14 @@ public class ToornamentClient implements IToornamentClient {
 
         List<IDiscipline> disciplines = new ArrayList<>();
 
-        disciplineObjects.forEach(disciplineObject -> disciplines.add(ToornamentUtils.getDisciplineFromJSON(disciplineObject)));
+        disciplineObjects.forEach(disciplineObject -> disciplines.add(ToornamentUtils.getDisciplineFromJSON(this, disciplineObject)));
 
         return disciplines;
     }
 
     @Override
     public IDiscipline getDisciplineByID(String ID) {
-        return ToornamentUtils.getDisciplineFromJSON(REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/disciplines/" + ID, DisciplineObject.class));
+        return ToornamentUtils.getDisciplineFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/disciplines/" + ID, DisciplineObject.class));
     }
 
     @Override
@@ -132,5 +134,10 @@ public class ToornamentClient implements IToornamentClient {
     @Override
     public ITournament getTournamentByID(long ID) {
         return ToornamentUtils.getTournamentFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/tournaments/" + ID, TournamentObject.class));
+    }
+
+    @Override
+    public IPlaylist getPlaylist(long ID) {
+        return ToornamentUtils.getPlaylistFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/playlist/" + ID, PlaylistObject.class));
     }
 }

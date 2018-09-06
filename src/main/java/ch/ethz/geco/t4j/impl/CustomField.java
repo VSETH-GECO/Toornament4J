@@ -73,4 +73,9 @@ public class CustomField implements ICustomField {
     public Integer getPosition() {
         return position;
     }
+
+    @Override
+    public IToornamentClient getClient() {
+        return client;
+    }
 }

@@ -1,51 +1,54 @@
 package ch.ethz.geco.t4j.impl;
 
 import ch.ethz.geco.t4j.obj.IDiscipline;
+import ch.ethz.geco.t4j.obj.IToornamentClient;
 
 import java.util.List;
 
 public class Discipline implements IDiscipline {
+    private final IToornamentClient client;
+
     /**
      * The unique ID of the discipline.
      */
-    protected final String id;
+    private final long id;
 
     /**
      * The name of the discipline.
      */
-    protected final String name;
+    private final String name;
 
     /**
      * The short name of the discipline.
      */
-    protected final String shortName;
+    private final String shortName;
 
     /**
      * The full name of the discipline.
      */
-    protected final String fullName;
+    private final String fullName;
 
     /**
      * The name of the right holder of the discipline.
      */
-    protected final String copyrights;
+    private final String copyrights;
 
     /**
      * The platforms on which the discipline can be played.
      */
-    protected final List<String> platforms;
+    private final List<String> platforms;
 
     /**
      * The minimal team size of the discipline.
      */
-    protected final Short minimalTeamSize;
+    private final Short minimalTeamSize;
 
     /**
      * The maximal team size of the discipline.
      */
-    protected final Short maximalTeamSize;
+    private final Short maximalTeamSize;
 
-    public Discipline(String id, String name, String shortName, String fullName, String copyrights, List<String> platforms, Short minimalTeamSize, Short maximalTeamSize) {
+    public Discipline(IToornamentClient client, long id, String name, String shortName, String fullName, String copyrights, List<String> platforms, Short minimalTeamSize, Short maximalTeamSize) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
@@ -54,6 +57,8 @@ public class Discipline implements IDiscipline {
         this.platforms = platforms;
         this.minimalTeamSize = minimalTeamSize;
         this.maximalTeamSize = maximalTeamSize;
+
+        this.client = client;
     }
 
     @Override
@@ -87,12 +92,17 @@ public class Discipline implements IDiscipline {
     }
 
     @Override
-    public String getID() {
+    public long getID() {
         return id;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public IToornamentClient getClient() {
+        return client;
     }
 }

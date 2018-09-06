@@ -1,6 +1,7 @@
 package ch.ethz.geco.t4j.obj;
 
 import ch.ethz.geco.t4j.obj.base.Closable;
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Identifiable;
 import ch.ethz.geco.t4j.obj.base.Positionable;
 
@@ -14,7 +15,7 @@ import ch.ethz.geco.t4j.obj.base.Positionable;
  * In such case, a single group is still created as a placeholder
  * to comply with the structure of the other stages.
  */
-public interface IGroup extends Identifiable, Positionable, Closable {
+public interface IGroup extends IToornamentObject, Identifiable, Positionable, Closable {
     int MAX_NAME_LENGTH = 30;
 
     /**

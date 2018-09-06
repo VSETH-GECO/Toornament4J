@@ -1,5 +1,6 @@
 package ch.ethz.geco.t4j.obj;
 
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Identifiable;
 
 import java.util.List;
@@ -7,21 +8,7 @@ import java.util.List;
 /**
  * A discipline represents the game which will be played at a tournament.
  */
-public interface IDiscipline {
-    /**
-     * Gets the unique ID of the discipline.
-     *
-     * @return the unique ID of the discipline.
-     */
-    String getID();
-
-    /**
-     * Gets the name of the discipline.
-     *
-     * @return the name of the discipline.
-     */
-    String getName();
-
+public interface IDiscipline extends IToornamentObject, Identifiable {
     /**
      * Gets the short name of the discipline.<br>
      * <b>Example:</b> CS:GO

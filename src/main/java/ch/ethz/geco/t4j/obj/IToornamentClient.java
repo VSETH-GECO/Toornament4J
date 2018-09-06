@@ -74,10 +74,16 @@ public interface IToornamentClient {
     /**
      * Gets a tournament by its ID.
      *
-     * @param ID the ID of the tournament.
+     * @param ID The ID of the tournament.
      * @return The tournament with the given ID.
      */
     ITournament getTournamentByID(long ID);
 
-
+    /**
+     * Gets a playlist by its ID.
+     *
+     * @param ID The ID of the playlist.
+     * @return The playlist with the given ID.
+     */
+    IPlaylist getPlaylist(long ID);
 }

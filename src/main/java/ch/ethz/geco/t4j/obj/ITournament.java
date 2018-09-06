@@ -1,6 +1,7 @@
 package ch.ethz.geco.t4j.obj;
 
 import ch.ethz.geco.t4j.obj.base.Closable;
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Identifiable;
 
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * groups, rounds, brackets, rankings and matches.
  * A match can be further detailed with subsets of a match usually called games or match games.
  */
-public interface ITournament extends Identifiable, Closable {
+public interface ITournament extends IToornamentObject, Identifiable, Closable {
     int MAX_NAME_LENGTH = 30;
     int MAX_FULL_NAME_LENGTH = 80;
 

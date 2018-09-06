@@ -1,12 +1,13 @@
 package ch.ethz.geco.t4j.obj;
 
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Identifiable;
 import ch.ethz.geco.t4j.obj.base.Positionable;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-public interface IMatch extends Identifiable, Positionable {
+public interface IMatch extends IToornamentObject, Identifiable, Positionable {
     /**
      * Gets the round that contains this match.
      *

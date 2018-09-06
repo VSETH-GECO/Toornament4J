@@ -1,6 +1,7 @@
 package ch.ethz.geco.t4j.obj;
 
 import ch.ethz.geco.t4j.obj.base.Closable;
+import ch.ethz.geco.t4j.obj.base.IToornamentObject;
 import ch.ethz.geco.t4j.obj.base.Identifiable;
 import ch.ethz.geco.t4j.obj.base.Positionable;
 
@@ -9,7 +10,7 @@ import ch.ethz.geco.t4j.obj.base.Positionable;
  * Its purpose is to arrange and organize the competition for some of the participants
  * following a specific and standardized method. The method is defined by the type of stage.
  */
-public interface IStage extends Identifiable, Positionable, Closable {
+public interface IStage extends IToornamentObject, Identifiable, Positionable, Closable {
     int MAX_NAME_LENGTH = 30;
 
     /**
