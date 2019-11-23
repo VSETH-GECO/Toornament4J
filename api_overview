@@ -1,0 +1,119 @@
+V: Viewer
+P: Participant
+O: Organizer
+A: Account
+
+*: Needs three-legged auth
++: Needs client auth
+
+Endpoints per Object:
+Client:
+    V:Disciplines: GET/disciplines
+    V:Disciplines: GET/disciplines/{id}
+    V:Playlists: GET/playlists/{id}
+    V:Tournaments: GET/tournaments/featured
+    V:Tournaments: GET/tournaments/{id}
+    P:Disciplines: GET/disciplines
+    P:Disciplines: GET/disciplines/{id}
+  * P:Participants: GET/me/participants
+  * P:Participants: GET/me/participants/{id}
+  * P:Participants: PATCH/me/participants/{id}
+  * P:Participants: GET/me/registrations
+  * P:Participants: POST/me/registrations
+  * P:Participants: GET/me/registrations/{id}
+  * P:Participants: PATCH/me/registrations/{id}
+    P:Participants: GET/tournaments/{id}
+    O:Disciplines: GET/disciplines
+    O:Disciplines: GET/disciplines/{id}
+  + O:Tournaments: GET/tournaments
+  + O:Tournaments: POST/tournaments
+  + O:Tournaments: GET/tournaments/{id}
+  + O:Tournaments: PATCH/tournaments/{id}
+  + O:Tournaments: DELETE/tournaments/{id}
+  + O:Webhooks: GET/webhooks
+  + O:Webhooks: POST/webhooks
+  + O:Webhooks: GET/webhooks/{id}
+  + O:Webhooks: PATCH/webhooks/{id}
+  + O:Webhooks: DELETE/webhooks/{id}
+  * A:Users: GET/me/info
+
+Tournament:
+    V:Custom Fields: GET/tournaments/{tournament_id}/custom-fields
+    V:Groups: GET/tournaments/{tournament_id}/groups
+    V:Groups: GET/tournaments/{tournament_id}/groups/{id}
+    V:Matches: GET/tournaments/{tournament_id}/matches
+    V:Matches: GET/tournaments/{tournament_id}/matches/{id}
+    V:Participants: GET/tournaments/{tournament_id}/participants
+    V:Participants: GET/tournaments/{tournament_id}/participants/{id}
+    V:Rounds: GET/tournaments/{tournament_id}/rounds
+    V:Rounds: GET/tournaments/{tournament_id}/rounds/{id}
+    V:Stages: GET/tournaments/{tournament_id}/stages
+    V:Stages: GET/tournaments/{tournament_id}/stages/{id}
+    V:Streams: GET/tournaments/{tournament_id}/streams
+    V:Videos: GET/tournaments/{tournament_id}/videos
+    P:Custom Fields: GET/tournaments/{tournament_id}/custom-fields
+  + O:Custom Fields: GET/tournaments/{tournament_id}/custom-fields
+  + O:Custom Fields: POST/tournaments/{tournament_id}/custom-fields
+  + O:Custom Fields: GET/tournaments/{tournament_id}/custom-fields/{id}
+  + O:Custom Fields: PATCH/tournaments/{tournament_id}/custom-fields/{id}
+  + O:Custom Fields: DELETE/tournaments/{tournament_id}/custom-fields/{id}
+  + O:Groups: GET/tournaments/{tournament_id}/groups
+  + O:Groups: GET/tournaments/{tournament_id}/groups/{id}
+  + O:Matches: GET/tournaments/{tournament_id}/matches
+  + O:Matches: GET/tournaments/{tournament_id}/matches/{id}
+  + O:Matches: PATCH/tournaments/{tournament_id}/matches/{id}
+  + O:Participants: GET/tournaments/{tournament_id}/participants
+  + O:Participants: POST/tournaments/{tournament_id}/participants
+  + O:Participants: GET/tournaments/{tournament_id}/participants/{id}
+  + O:Participants: PATCH/tournaments/{tournament_id}/participants/{id}
+  + O:Participants: DELETE/tournaments/{tournament_id}/participants/{id}
+  + O:Registrations: GET/tournaments/{tournament_id}/registrations
+  + O:Registrations: POST/tournaments/{tournament_id}/registrations
+  + O:Registrations: GET/tournaments/{tournament_id}/registrations/{id}
+  + O:Registrations: PATCH/tournaments/{tournament_id}/registrations/{id}
+  + O:Registrations: DELETE/tournaments/{tournament_id}/registrations/{id}
+  + O:Rounds: GET/tournaments/{tournament_id}/rounds
+  + O:Rounds: GET/tournaments/{tournament_id}/rounds/{id}
+  + O:Stages: GET/tournaments/{tournament_id}/stages
+  + O:Stages: GET/tournaments/{tournament_id}/stages/{id}
+  + O:Streams: GET/tournaments/{tournament_id}/streams
+  + O:Streams: POST/tournaments/{tournament_id}/streams
+  + O:Streams: GET/tournaments/{tournament_id}/streams/{id}
+  + O:Streams: PATCH/tournaments/{tournament_id}/streams/{id}
+  + O:Streams: DELETE/tournaments/{tournament_id}/streams/{id}
+  + O:Permissions: GET/tournaments/{tournament_id}/permissions
+  + O:Permissions: POST/tournaments/{tournament_id}/permissions
+  + O:Permissions: GET/tournaments/{tournament_id}/permissions/{id}
+  + O:Permissions: PATCH/tournaments/{tournament_id}/permissions/{id}
+  + O:Permissions: DELETE/tournaments/{tournament_id}/permissions/{id}
+    
+    Stage:
+        V:Brackets: GET/tournaments/{tournament_id}/stages/{stage_id}/bracket-nodes
+        V:Rankings: GET/tournaments/{tournament_id}/stages/{stage_id}/ranking-items
+      + O:Rankings: GET/tournaments/{tournament_id}/stages/{stage_id}/ranking-items 
+
+    Match:
+        V:Match Games: GET/tournaments/{tournament_id}/matches/{match_id}/games/{number}
+        V:Videos: GET/tournaments/{tournament_id}/matches/{match_id}/videos
+      + O:Match Games: GET/tournaments/{tournament_id}/matches/{match_id}/games
+      + O:Match Games: GET/tournaments/{tournament_id}/matches/{match_id}/games/{number}
+      + O:Match Games: PATCH/tournaments/{tournament_id}/matches/{match_id}/games/{number}
+      + O:Match Reports: GET/tournaments/{tournament_id}/matches/{match_id}/reports
+      + O:Match Reports: POST/tournaments/{tournament_id}/matches/{match_id}/reports
+      + O:Match Reports: GET/tournaments/{tournament_id}/matches/{match_id}/reports/{id}
+      + O:Match Reports: PATCH/tournaments/{tournament_id}/matches/{match_id}/reports/{id}
+      + O:Streams: GET/tournaments/{tournament_id}/matches/{match_id}/streams
+      + O:Streams: PUT/tournaments/{tournament_id}/matches/{match_id}/streams
+
+Discipline:
+    V:Matches: GET/disciplines/{discipline_id}/matches
+
+Playlist:
+    V:Tournaments: GET/playlists/{id}/tournaments
+    
+Webhooks:
+  + O:Webhooks: GET/webhooks/{webhook_id}/subscriptions
+  + O:Webhooks: POST/webhooks/{webhook_id}/subscriptions
+  + O:Webhooks: GET/webhooks/{webhook_id}/subscriptions/{id}
+  + O:Webhooks: PATCH/webhooks/{webhook_id}/subscriptions/{id}
+  + O:Webhooks: DELETE/webhooks/{webhook_id}/subscriptions/{id}

@@ -1,254 +1,183 @@
 package ch.ethz.geco.t4j.internal;
 
-import ch.ethz.geco.t4j.obj.IToornamentClient;
-import ch.ethz.geco.t4j.util.LogMarkers;
-import ch.ethz.geco.t4j.util.ToornamentException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.http.client.HttpClient;
+import reactor.util.annotation.Nullable;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-
-import static ch.ethz.geco.t4j.Toornament4J.LOGGER;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class Requests {
-    /**
-     * Used to send POST requests.
-     */
-    public final Request POST;
-    /**
-     * Used to send GET requests.
-     */
-    public final Request GET;
-    /**
-     * Used to send DELETE requests.
-     */
-    public final Request DELETE;
-    /**
-     * Used to send PATCH requests.
-     */
-    public final Request PATCH;
-    /**
-     * Used to send PUT requests.
-     */
-    public final Request PUT;
+    private final GECoClient gecoClient;
+    private final HttpClient httpClient;
 
-    /**
-     * The HTTP client used for accessing the API
-     */
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    public enum METHOD {GET, POST, DELETE, PATCH}
 
     /**
      * Constructs a new Request holder.
      *
-     * @param client The toornament client, can be null if no API key is needed.
+     * @param client The GECo client, can be null if no API key is needed.
      */
-    public Requests(IToornamentClient client) {
-        POST = new Request(HttpPost.class, client);
-        GET = new Request(HttpGet.class, client);
-        DELETE = new Request(HttpDelete.class, client);
-        PATCH = new Request(HttpPatch.class, client);
-        PUT = new Request(HttpPut.class, client);
+    public Requests(GECoClient client) {
+        gecoClient = client;
+        httpClient = HttpClient.create().headers(h -> {
+            h.add("X-API-KEY", client.getAPIToken());
+            h.add("Content-Type", "application/json");
+        }).baseUrl(Endpoints.BASE);
     }
 
-    public final class Request {
-        /**
-         * The class of the method type used for the request
-         */
-        private final Class<? extends HttpUriRequest> requestClass;
+    /**
+     * Gets the shared http client.
+     *
+     * @return the HTTP client.
+     */
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
 
-        /**
-         * The client used for these requests.
-         */
-        private final IToornamentClient client;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 
-        private Request(Class<? extends HttpUriRequest> requestClass, IToornamentClient client) {
-            this.requestClass = requestClass;
-            this.client = client;
-        }
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
+        int capacity = buf.length;
+        int nread = 0;
+        int n;
+        for (; ; ) {
+            // read to EOF which may read more or less than initial buffer size
+            while ((n = inputStream.read(buf, nread, capacity - nread)) > 0)
+                nread += n;
 
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param entity  Any data to serialize and send in the body of the request.
-         * @param clazz   The class of the object to deserialize the json response into.
-         * @param headers The headers to include in the request.
-         * @param <T>     The type of the object to deserialize the json response into.
-         * @return The deserialized response.
-         */
-        public <T> T makeRequest(String url, Object entity, Class<T> clazz, BasicNameValuePair... headers) {
-            try {
-                return makeRequest(url, ToornamentUtils.MAPPER.writeValueAsString(entity), clazz, headers);
-            } catch (JsonProcessingException e) {
-                throw new ToornamentException("Unable to serialize request!", e);
+            // if the last call to read returned -1, then we're done
+            if (n < 0)
+                break;
+
+            // need to allocate a larger buffer
+            if (capacity <= MAX_BUFFER_SIZE - capacity) {
+                capacity = capacity << 1;
+            } else {
+                if (capacity == MAX_BUFFER_SIZE)
+                    throw new OutOfMemoryError("Required array size too large");
+                capacity = MAX_BUFFER_SIZE;
             }
+            buf = Arrays.copyOf(buf, capacity);
         }
+        return (capacity == nread) ? buf : Arrays.copyOf(buf, nread);
+    }
 
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param entity  Any data to serialize and send in the body of the request.
-         * @param clazz   The class of the object to deserialize the json response into.
-         * @param headers The headers to include in the request.
-         * @param <T>     The type of the object to deserialize the json response into.
-         * @return The deserialized response.
-         */
-        public <T> T makeRequest(String url, String entity, Class<T> clazz, BasicNameValuePair... headers) {
+    private <T> Mono<T> makeAndroidRequest(METHOD method, String url, Class<T> clazz, String content) {
+        return Mono.fromSupplier(() -> 0).flatMap(a -> {
             try {
-                String response = makeRequest(url, entity, headers);
-                return response == null ? null : ToornamentUtils.MAPPER.readValue(response, clazz);
-            } catch (IOException e) {
-                throw new ToornamentException("Unable to serialize request!", e);
-            }
-        }
+                HttpURLConnection request = (HttpURLConnection) new URL(url).openConnection();
 
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param clazz   The class of the object to deserialize the json response into.
-         * @param headers The headers to include in the request.
-         * @param <T>     The type of the object to deserialize the json response into.
-         * @return The deserialized response.
-         */
-        public <T> T makeRequest(String url, Class<T> clazz, BasicNameValuePair... headers) {
-            try {
-                String response = makeRequest(url, headers);
-                return response == null ? null : ToornamentUtils.MAPPER.readValue(response, clazz);
-            } catch (IOException e) {
-                throw new ToornamentException("Unable to serialize request!", e);
-            }
-        }
+                request.setRequestProperty("X-API-KEY", gecoClient.getAPIToken());
+                request.setRequestProperty("Content-Type", "application/json");
 
-        /**
-         * Makes a request.
-         *
-         * @param url           The url to make the request to.
-         * @param typeReference The type of the object to deserialize the json response into.
-         * @param headers       The headers to include in the request.
-         * @param <T>           The type of the object to deserialize the json response into.
-         * @return The deserialized response.
-         */
-        public <T> T makeRequest(String url, TypeReference typeReference, BasicNameValuePair... headers) {
-            try {
-                String response = makeRequest(url, headers);
-                return response == null ? null : ToornamentUtils.MAPPER.readValue(response, typeReference);
-            } catch (IOException e) {
-                throw new ToornamentException("Unable to serialize request!", e);
-            }
-        }
+                request.setRequestMethod(method.name());
+                if (method != METHOD.GET) {
+                    request.setDoOutput(true);
 
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param entity  Any data to serialize and send in the body of the request.
-         * @param headers The headers to include in the request.
-         */
-        public void makeRequest(String url, Object entity, BasicNameValuePair... headers) {
-            try {
-                makeRequest(url, ToornamentUtils.MAPPER.writeValueAsString(entity), headers);
-            } catch (IOException e) {
-                throw new ToornamentException("Unable to serialize request!", e);
-            }
-        }
-
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param entity  Any data to serialize and send in the body of the request.
-         * @param headers The headers to include in the request.
-         * @return The response as a byte array.
-         */
-        public String makeRequest(String url, String entity, BasicNameValuePair... headers) {
-            return makeRequest(url, new StringEntity(entity, "UTF-8"), headers);
-        }
-
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param headers The headers to include in the request.
-         * @return The response as a byte array.
-         */
-        public String makeRequest(String url, BasicNameValuePair... headers) {
-            try {
-                HttpUriRequest request = this.requestClass.getConstructor(String.class).newInstance(url);
-                for (BasicNameValuePair header : headers) {
-                    request.addHeader(header.getName(), header.getValue());
+                    OutputStream outputStream = request.getOutputStream();
+                    outputStream.write(content.getBytes(StandardCharsets.UTF_8));
+                    outputStream.close();
                 }
 
-                return request(request);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                LOGGER.error(LogMarkers.API, "Toornament4J Internal Exception", e);
-                return null;
-            }
-        }
+                request.connect();
+                int responseCode = request.getResponseCode();
 
+                InputStream inputStream = request.getInputStream();
+                byte[] bytes = readAllBytes(inputStream);
 
-        /**
-         * Makes a request.
-         *
-         * @param url     The url to make the request to.
-         * @param entity  Any data to serialize and send in the body of the request.
-         * @param headers The headers to include in the request.
-         * @return The response as a byte array.
-         */
-        public String makeRequest(String url, HttpEntity entity, BasicNameValuePair... headers) {
-            try {
-                if (HttpEntityEnclosingRequestBase.class.isAssignableFrom(this.requestClass)) {
-                    HttpEntityEnclosingRequestBase request = (HttpEntityEnclosingRequestBase)
-                            this.requestClass.getConstructor(String.class).newInstance(url);
-                    for (BasicNameValuePair header : headers) {
-                        request.addHeader(header.getName(), header.getValue());
+                String data = new String(bytes, StandardCharsets.UTF_8);
+                if (responseCode == 403 || responseCode == 404 || responseCode == 424) {
+                    JsonNode jsonNode = GECoUtils.MAPPER.readTree(data);
+
+                    JsonNode message = jsonNode.get("message");
+                    JsonNode code = jsonNode.get("code");
+
+                    if (code == null) {
+                        return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
                     }
-                    request.setEntity(entity);
-                    return request(request);
-                } else {
-                    LOGGER.error(LogMarkers.API, "Tried to attach HTTP entity to invalid type! ({})", this.requestClass.getSimpleName());
-                }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                LOGGER.error(LogMarkers.API, "Toornament4J Internal Exception", e);
-            }
-            return null;
-        }
 
-        private String request(HttpUriRequest request) {
-            if (client != null)
-                request.addHeader("X-API-KEY", client.getAPIToken());
-
-            try (CloseableHttpResponse response = httpClient.execute(request)) {
-                int responseCode = response.getStatusLine().getStatusCode();
-
-                String data = null;
-                if (response.getEntity() != null)
-                    data = EntityUtils.toString(response.getEntity());
-
-                if (responseCode == 404) {
-                    LOGGER.error(LogMarkers.API, "Received 404 error, please notify the developer and include the URL ({})", request.getURI());
-                    return null;
-                } else if (responseCode == 403) {
-                    LOGGER.error(LogMarkers.API, "Received 403 forbidden error for url {}. If you believe this is a Toornament4J error, report this!", request.getURI());
-                    return null;
-                } else if ((responseCode < 200 || responseCode > 299)) {
-                    throw new ToornamentException("Error on request to " + request.getURI() + ". Received response code " + responseCode + ". With response text: " + data);
+                    return Mono.error(new APIException(message != null ? message.asText() : "None", code.asInt()));
+                } else if (responseCode < 200 || responseCode > 299) {
+                    return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
                 }
 
-                return data;
+                return Mono.just(GECoUtils.MAPPER.readValue(data, clazz));
             } catch (IOException e) {
-                LOGGER.error(LogMarkers.API, "Toornament4J Internal Exception", e);
-                return null;
+                e.printStackTrace();
             }
+
+            return Mono.empty();
+        });
+    }
+
+    public <T> Mono<T> makeRequest(METHOD method, String url, Class<T> clazz, @Nullable String content) {
+        // Use java.net for Android since netty seems to be problematic
+        if (!System.getProperty("java.vm.vendor", "").equals("The Android Project")) {
+            return makeAndroidRequest(method, Endpoints.BASE + url, clazz, content).subscribeOn(Schedulers.single());
         }
+
+        HttpClient.ResponseReceiver<?> receiver = null;
+        switch (method) {
+            case GET:
+                receiver = httpClient.get().uri(url);
+                break;
+            case POST:
+                receiver = httpClient.post().uri(url).send(ByteBufFlux.fromString(content != null ? Flux.just(content) : Flux.empty()));
+                break;
+            case PATCH:
+                receiver = httpClient.patch().uri(url).send(ByteBufFlux.fromString(content != null ? Flux.just(content) : Flux.empty()));
+                break;
+            case DELETE:
+                receiver = httpClient.delete().uri(url).send(ByteBufFlux.fromString(content != null ? Flux.just(content) : Flux.empty()));
+                break;
+        }
+
+        return receiver.responseSingle((response, responseContent) -> {
+            int responseCode = response.status().code();
+            return responseContent.asString().flatMap(data -> {
+                if (responseCode == 403 || responseCode == 404 || responseCode == 424) {
+                    JsonNode jsonNode;
+                    try {
+                        jsonNode = GECoUtils.MAPPER.readTree(data);
+
+                        JsonNode message = jsonNode.get("message");
+                        JsonNode code = jsonNode.get("code");
+
+                        // If it's not a "controlled" exception
+                        if (code == null) {
+                            return Mono.error(new GECo4JException("Error on request to " + response.uri() + ". Received response code " + responseCode + ". With response text: " + data));
+                        }
+
+                        return Mono.error(new APIException(message != null ? message.asText() : "None", code.asInt()));
+                    } catch (IOException e) {
+                        return Mono.error(e);
+                    }
+                } else if (responseCode < 200 || responseCode > 299) {
+                    return Mono.error(new GECo4JException("Error on request to " + response.uri() + ". Received response code " + responseCode + ". With response text: " + data));
+                }
+
+                try {
+                    if (clazz == null) {
+                        return Mono.empty();
+                    }
+
+                    return Mono.just(GECoUtils.MAPPER.readValue(data, clazz));
+                } catch (IOException e) {
+                    return Mono.error(e);
+                }
+            });
+        });
     }
 }
