@@ -1,9 +1,9 @@
 package ch.ethz.geco.t4j.impl;
 
 import ch.ethz.geco.t4j.internal.Endpoints;
-import ch.ethz.geco.t4j.internal.ToornamentUtils;
-import ch.ethz.geco.t4j.internal.json.objects.CustomFieldObject;
-import ch.ethz.geco.t4j.internal.json.objects.ParticipantObject;
+import ch.ethz.geco.t4j.internal.JsonMapper;
+import ch.ethz.geco.t4j.internal.json.CustomFieldObject;
+import ch.ethz.geco.t4j.internal.json.ParticipantObject;
 import ch.ethz.geco.t4j.obj.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -221,7 +221,7 @@ public class Tournament implements ITournament {
         List<ICustomField> customFields = new ArrayList<>();
 
         for (CustomFieldObject customFieldObject : customFieldObjects) {
-            customFields.add(ToornamentUtils.getCustomFieldByJSON(client, customFieldObject));
+            customFields.add(JsonMapper.getCustomFieldByJSON(client, customFieldObject));
         }
 
         return customFields;
@@ -238,7 +238,7 @@ public class Tournament implements ITournament {
         List<IParticipant> participants = new ArrayList<>();
 
         for (ParticipantObject participantObject : participantObjects) {
-            participants.add(ToornamentUtils.getParticipantFromJSON(client, participantObject));
+            participants.add(JsonMapper.getParticipantFromJSON(client, participantObject));
         }
 
         return participants;
@@ -246,7 +246,7 @@ public class Tournament implements ITournament {
 
     @Override
     public IParticipant getParticipantByID(Long participantID) {
-        return ToornamentUtils.getParticipantFromJSON(this.client, ((ToornamentClient) client).REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/tournaments/" + id + "/participants/" + participantID, ParticipantObject.class));
+        return JsonMapper.getParticipantFromJSON(this.client, ((ToornamentClient) client).REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/tournaments/" + id + "/participants/" + participantID, ParticipantObject.class));
     }
 
     @Override

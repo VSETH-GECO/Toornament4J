@@ -7,7 +7,7 @@ import ch.ethz.geco.t4j.impl.Playlist;
 import ch.ethz.geco.t4j.impl.Tournament;
 import ch.ethz.geco.t4j.internal.auth.Scope;
 import ch.ethz.geco.t4j.internal.auth.Token;
-import ch.ethz.geco.t4j.internal.json.objects.*;
+import ch.ethz.geco.t4j.internal.json.*;
 import ch.ethz.geco.t4j.obj.*;
 import ch.ethz.geco.t4j.util.LogMarkers;
 import ch.ethz.geco.t4j.util.ToornamentException;
@@ -21,13 +21,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ToornamentUtils {
+public class JsonMapper {
     public static final ObjectMapper MAPPER = new ObjectMapper();
-
-    // Use jackson afterburner
-    static {
-        MAPPER.registerModule(new AfterburnerModule());
-    }
 
     /**
      * Converts a token JSON object to a token object.

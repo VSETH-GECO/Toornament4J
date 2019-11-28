@@ -1,5 +1,6 @@
 package ch.ethz.geco.t4j.internal;
 
+import ch.ethz.geco.t4j.impl.ToornamentClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class Requests {
-    private final GECoClient gecoClient;
+    private final ToornamentClient toornamentClient;
     private final HttpClient httpClient;
 
     public enum METHOD {GET, POST, DELETE, PATCH}
@@ -27,8 +28,8 @@ public class Requests {
      *
      * @param client The GECo client, can be null if no API key is needed.
      */
-    public Requests(GECoClient client) {
-        gecoClient = client;
+    public Requests(ToornamentClient client) {
+        toornamentClient = client;
         httpClient = HttpClient.create().headers(h -> {
             h.add("X-API-KEY", client.getAPIToken());
             h.add("Content-Type", "application/json");
@@ -47,6 +48,13 @@ public class Requests {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final int MAX_BUFFER_SIZE = Integer.MAX_VALUE - 8;
 
+    /**
+     * Reads all bytes from an input stream, returning a byte array. This is needed for Android.
+     *
+     * @param inputStream The input stream to read from.
+     * @return A byte array containing all bytes read from the input stream.
+     * @throws IOException If a read error occurs.
+     */
     private byte[] readAllBytes(InputStream inputStream) throws IOException {
         byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
         int capacity = buf.length;
@@ -74,12 +82,42 @@ public class Requests {
         return (capacity == nread) ? buf : Arrays.copyOf(buf, nread);
     }
 
+    /**
+     * Handles errors by checking the response code and body. Returns an empty Mono if there was no error.
+     *
+     * @param responseCode The response code of the request.
+     * @param response     The response body of the request.
+     * @return A Mono.error if an error occurred in the request, empty Mono otherwise.
+     */
+    private Mono<Void> handleError(int responseCode, String response) {
+        if (responseCode >= 400 && responseCode <= 499) { // All client errors
+            if (response.isEmpty()) {
+
+            }
+
+            JsonNode jsonNode = JsonMapper.MAPPER.readTree(data);
+
+            JsonNode message = jsonNode.get("message");
+            JsonNode code = jsonNode.get("code");
+
+            if (code == null) {
+                return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
+            }
+
+            return Mono.error(new APIException(message != null ? message.asText() : "None", code.asInt()));
+        } else if (responseCode < 200 || responseCode > 299) { // All other response codes including 500s
+            return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
+        }
+
+        return Mono.empty();
+    }
+
     private <T> Mono<T> makeAndroidRequest(METHOD method, String url, Class<T> clazz, String content) {
         return Mono.fromSupplier(() -> 0).flatMap(a -> {
             try {
                 HttpURLConnection request = (HttpURLConnection) new URL(url).openConnection();
 
-                request.setRequestProperty("X-API-KEY", gecoClient.getAPIToken());
+                request.setRequestProperty("X-API-KEY", toornamentClient.getAPIToken());
                 request.setRequestProperty("Content-Type", "application/json");
 
                 request.setRequestMethod(method.name());
@@ -98,22 +136,9 @@ public class Requests {
                 byte[] bytes = readAllBytes(inputStream);
 
                 String data = new String(bytes, StandardCharsets.UTF_8);
-                if (responseCode == 403 || responseCode == 404 || responseCode == 424) {
-                    JsonNode jsonNode = GECoUtils.MAPPER.readTree(data);
 
-                    JsonNode message = jsonNode.get("message");
-                    JsonNode code = jsonNode.get("code");
 
-                    if (code == null) {
-                        return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
-                    }
-
-                    return Mono.error(new APIException(message != null ? message.asText() : "None", code.asInt()));
-                } else if (responseCode < 200 || responseCode > 299) {
-                    return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
-                }
-
-                return Mono.just(GECoUtils.MAPPER.readValue(data, clazz));
+                return Mono.just(JsonMapper.MAPPER.readValue(data, clazz));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -173,7 +198,7 @@ public class Requests {
                         return Mono.empty();
                     }
 
-                    return Mono.just(GECoUtils.MAPPER.readValue(data, clazz));
+                    return Mono.just(JsonMapper.MAPPER.readValue(data, clazz));
                 } catch (IOException e) {
                     return Mono.error(e);
                 }

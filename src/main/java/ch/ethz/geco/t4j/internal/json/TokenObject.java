@@ -1,4 +1,4 @@
-package ch.ethz.geco.t4j.internal.json.objects;
+package ch.ethz.geco.t4j.internal.json;
 
 public class TokenObject {
     public String access_token;

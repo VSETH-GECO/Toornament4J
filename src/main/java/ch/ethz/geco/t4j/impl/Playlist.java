@@ -2,8 +2,8 @@ package ch.ethz.geco.t4j.impl;
 
 import ch.ethz.geco.t4j.internal.Endpoints;
 import ch.ethz.geco.t4j.internal.Requests;
-import ch.ethz.geco.t4j.internal.ToornamentUtils;
-import ch.ethz.geco.t4j.internal.json.objects.TournamentObject;
+import ch.ethz.geco.t4j.internal.JsonMapper;
+import ch.ethz.geco.t4j.internal.json.TournamentObject;
 import ch.ethz.geco.t4j.obj.IPlaylist;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
 import ch.ethz.geco.t4j.obj.ITournament;
@@ -63,7 +63,7 @@ public class Playlist implements IPlaylist {
 
         List<ITournament> tournaments = new ArrayList<>();
 
-        tournamentObjects.forEach(tournamentObject -> tournaments.add(ToornamentUtils.getTournamentFromJSON(client, tournamentObject)));
+        tournamentObjects.forEach(tournamentObject -> tournaments.add(JsonMapper.getTournamentFromJSON(client, tournamentObject)));
 
         return tournaments;
     }

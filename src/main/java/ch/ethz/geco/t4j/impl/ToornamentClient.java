@@ -3,10 +3,10 @@ package ch.ethz.geco.t4j.impl;
 import ch.ethz.geco.t4j.internal.Endpoints;
 import ch.ethz.geco.t4j.internal.FeaturedTournamentFilter;
 import ch.ethz.geco.t4j.internal.Requests;
-import ch.ethz.geco.t4j.internal.ToornamentUtils;
-import ch.ethz.geco.t4j.internal.json.objects.DisciplineObject;
-import ch.ethz.geco.t4j.internal.json.objects.PlaylistObject;
-import ch.ethz.geco.t4j.internal.json.objects.TournamentObject;
+import ch.ethz.geco.t4j.internal.JsonMapper;
+import ch.ethz.geco.t4j.internal.json.DisciplineObject;
+import ch.ethz.geco.t4j.internal.json.PlaylistObject;
+import ch.ethz.geco.t4j.internal.json.TournamentObject;
 import ch.ethz.geco.t4j.obj.IDiscipline;
 import ch.ethz.geco.t4j.obj.IPlaylist;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
@@ -92,14 +92,14 @@ public class ToornamentClient implements IToornamentClient {
 
         List<IDiscipline> disciplines = new ArrayList<>();
 
-        disciplineObjects.forEach(disciplineObject -> disciplines.add(ToornamentUtils.getDisciplineFromJSON(this, disciplineObject)));
+        disciplineObjects.forEach(disciplineObject -> disciplines.add(JsonMapper.getDisciplineFromJSON(this, disciplineObject)));
 
         return disciplines;
     }
 
     @Override
     public IDiscipline getDisciplineByID(String ID) {
-        return ToornamentUtils.getDisciplineFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/disciplines/" + ID, DisciplineObject.class));
+        return JsonMapper.getDisciplineFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/disciplines/" + ID, DisciplineObject.class));
     }
 
     @Override
@@ -126,18 +126,18 @@ public class ToornamentClient implements IToornamentClient {
 
         List<ITournament> tournaments = new ArrayList<>();
 
-        tournamentObjects.forEach(tournamentObject -> tournaments.add(ToornamentUtils.getTournamentFromJSON(this, tournamentObject)));
+        tournamentObjects.forEach(tournamentObject -> tournaments.add(JsonMapper.getTournamentFromJSON(this, tournamentObject)));
 
         return tournaments;
     }
 
     @Override
     public ITournament getTournamentByID(long ID) {
-        return ToornamentUtils.getTournamentFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/tournaments/" + ID, TournamentObject.class));
+        return JsonMapper.getTournamentFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/tournaments/" + ID, TournamentObject.class));
     }
 
     @Override
     public IPlaylist getPlaylist(long ID) {
-        return ToornamentUtils.getPlaylistFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/playlist/" + ID, PlaylistObject.class));
+        return JsonMapper.getPlaylistFromJSON(this, REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/playlist/" + ID, PlaylistObject.class));
     }
 }

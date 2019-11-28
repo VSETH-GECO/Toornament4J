@@ -1,4 +1,4 @@
-package ch.ethz.geco.t4j.internal.json.objects;
+package ch.ethz.geco.t4j.internal.json;
 
 /**
  * Represents an opponent json object used in matches and brackets

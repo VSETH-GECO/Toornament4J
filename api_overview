@@ -110,7 +110,7 @@ Discipline:
 
 Playlist:
     V:Tournaments: GET/playlists/{id}/tournaments
-    
+
 Webhooks:
   + O:Webhooks: GET/webhooks/{webhook_id}/subscriptions
   + O:Webhooks: POST/webhooks/{webhook_id}/subscriptions

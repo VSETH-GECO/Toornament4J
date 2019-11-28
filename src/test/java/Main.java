@@ -1,7 +1,4 @@
 import ch.ethz.geco.t4j.impl.ToornamentClient;
-import ch.ethz.geco.t4j.internal.FeaturedTournamentFilter;
-import ch.ethz.geco.t4j.internal.ToornamentUtils;
-import ch.ethz.geco.t4j.internal.json.objects.CustomFieldObject;
 import ch.ethz.geco.t4j.obj.ICustomField;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
 import ch.ethz.geco.t4j.obj.ITournament;

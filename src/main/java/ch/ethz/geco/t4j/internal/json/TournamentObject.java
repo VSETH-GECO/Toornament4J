@@ -1,6 +1,5 @@
-package ch.ethz.geco.t4j.internal.json.objects;
+package ch.ethz.geco.t4j.internal.json;
 
-import ch.ethz.geco.t4j.internal.json.objects.custom.LogoObject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;

@@ -2,8 +2,8 @@ package ch.ethz.geco.t4j.internal.auth;
 
 import ch.ethz.geco.t4j.internal.Endpoints;
 import ch.ethz.geco.t4j.internal.Requests;
-import ch.ethz.geco.t4j.internal.ToornamentUtils;
-import ch.ethz.geco.t4j.internal.json.objects.TokenObject;
+import ch.ethz.geco.t4j.internal.JsonMapper;
+import ch.ethz.geco.t4j.internal.json.TokenObject;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -30,7 +30,7 @@ public class Authorization {
         payload.add(new BasicNameValuePair("client_secret", clientSecret));
         payload.add(new BasicNameValuePair("scope", scopeString.toString()));
 
-        return ToornamentUtils.getTokenFromJSON(REQUESTS.POST.makeRequest(Endpoints.CRED_AUTH, URLEncodedUtils.format(payload, "UTF-8"),
+        return JsonMapper.getTokenFromJSON(REQUESTS.POST.makeRequest(Endpoints.CRED_AUTH, URLEncodedUtils.format(payload, "UTF-8"),
                 TokenObject.class, new BasicNameValuePair("Content-Type", "application/x-www-form-urlencoded")));
     }
 
@@ -56,7 +56,7 @@ public class Authorization {
             payload.add(new BasicNameValuePair("client_secret", clientSecret));
             payload.add(new BasicNameValuePair("refresh_token", token.getRefreshToken()));
 
-            return ToornamentUtils.getTokenFromJSON(REQUESTS.POST.makeRequest(Endpoints.CRED_AUTH, URLEncodedUtils.format(payload, "UTF-8"),
+            return JsonMapper.getTokenFromJSON(REQUESTS.POST.makeRequest(Endpoints.CRED_AUTH, URLEncodedUtils.format(payload, "UTF-8"),
                     TokenObject.class, new BasicNameValuePair("Content-Type", "application/x-www-form-urlencoded")));
         } else {
             return getAccessToken(clientID, clientSecret, token.getScope());

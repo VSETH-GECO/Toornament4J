@@ -1,4 +1,4 @@
-package ch.ethz.geco.t4j.internal.json.objects.custom;
+package ch.ethz.geco.t4j.internal.json.custom;
 
 /**
  * Represents a logo custom field json object.
