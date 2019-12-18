@@ -1,14 +1,14 @@
 package ch.ethz.geco.t4j.util;
 
-public class ToornamentException extends RuntimeException {
+public class Toornament4JException extends RuntimeException {
     private String message;
 
-    public ToornamentException(String message) {
+    public Toornament4JException(String message) {
         super(message);
         this.message = message;
     }
 
-    public ToornamentException(String message, Throwable cause) {
+    public Toornament4JException(String message, Throwable cause) {
         super(message, cause);
         this.message = message;
     }

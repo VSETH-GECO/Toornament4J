@@ -1,6 +1,10 @@
 package ch.ethz.geco.t4j.internal;
 
+import ch.ethz.geco.t4j.Toornament4J;
 import ch.ethz.geco.t4j.impl.ToornamentClient;
+import ch.ethz.geco.t4j.internal.json.ErrorObject;
+import ch.ethz.geco.t4j.util.APIException;
+import ch.ethz.geco.t4j.util.Toornament4JException;
 import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -86,30 +90,39 @@ public class Requests {
      * Handles errors by checking the response code and body. Returns an empty Mono if there was no error.
      *
      * @param responseCode The response code of the request.
+     * @param url          The URL of the request for better error reporting.
      * @param response     The response body of the request.
-     * @return A Mono.error if an error occurred in the request, empty Mono otherwise.
+     * @return A Mono.error if an error occurred in the request, Mono.empty otherwise.
      */
-    private Mono<Void> handleError(int responseCode, String response) {
-        if (responseCode >= 400 && responseCode <= 499) { // All client errors
+    private Mono<Void> handleError(int responseCode, String url, String response) {
+        // Return on success
+        if (responseCode >= 200 && responseCode <= 299) {
+            return Mono.empty();
+        } else if (responseCode >= 400 && responseCode <= 499) { // All client errors
             if (response.isEmpty()) {
-
+                return Mono.error(new APIException(null, responseCode));
             }
 
-            JsonNode jsonNode = JsonMapper.MAPPER.readTree(data);
+            // Determine Error Type
+            try {
+                JsonNode jsonNode = JsonMapper.MAPPER.readTree(response);
 
-            JsonNode message = jsonNode.get("message");
-            JsonNode code = jsonNode.get("code");
+                if (jsonNode.has("error")) {
+                    return Mono.error(new APIException(null, responseCode));
+                } else {
+                    ErrorObject errorObject = JsonMapper.MAPPER.readValue(response, ErrorObject.class);
 
-            if (code == null) {
-                return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
+                    return Mono.error(new APIException());
+                }
+            } catch (IOException e) { // If an error happened while parsing the API error
+                Toornament4J.LOGGER.error("Unparsable error on request to " + url + ". Received code " + responseCode + " with response text: \n\t" + response + "\nPlease contact a developer.");
+                return Mono.error(new APIException(null, responseCode));
             }
 
             return Mono.error(new APIException(message != null ? message.asText() : "None", code.asInt()));
-        } else if (responseCode < 200 || responseCode > 299) { // All other response codes including 500s
-            return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + data));
+        } else { // All other response codes including 500s
+            return Mono.error(new GECo4JException("Error on request to " + request.getURL() + ". Received response code " + responseCode + ". With response text: " + response));
         }
-
-        return Mono.empty();
     }
 
     private <T> Mono<T> makeAndroidRequest(METHOD method, String url, Class<T> clazz, String content) {

@@ -10,9 +10,8 @@ import ch.ethz.geco.t4j.internal.auth.Token;
 import ch.ethz.geco.t4j.internal.json.*;
 import ch.ethz.geco.t4j.obj.*;
 import ch.ethz.geco.t4j.util.LogMarkers;
-import ch.ethz.geco.t4j.util.ToornamentException;
+import ch.ethz.geco.t4j.util.Toornament4JException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -95,7 +94,7 @@ public class JsonMapper {
                 status = ITournament.Status.COMPLETED;
                 break;
             default:
-                throw new ToornamentException("Unknown status: " + tournamentObject.status + ". Please contact a developer!");
+                throw new Toornament4JException("Unknown status: " + tournamentObject.status + ". Please contact a developer!");
         }
 
         Boolean isSingleplayer = null;
@@ -108,7 +107,7 @@ public class JsonMapper {
                     isSingleplayer = true;
                     break;
                 default:
-                    throw new ToornamentException("Unknown participant type: " + tournamentObject.participant_type + ". Please contact a developer!");
+                    throw new Toornament4JException("Unknown participant type: " + tournamentObject.participant_type + ". Please contact a developer!");
             }
         }
 
@@ -152,7 +151,7 @@ public class JsonMapper {
                     target = ICustomField.Target.TEAM_PLAYER;
                     break;
                 default:
-                    throw new ToornamentException("Unknown target type: " + customFieldObject.target_type + ". Please contact a developer!");
+                    throw new Toornament4JException("Unknown target type: " + customFieldObject.target_type + ". Please contact a developer!");
             }
         } else {
             Toornament4J.LOGGER.warn(LogMarkers.UTIL, "Got CustomFieldObject without target_type. Please contact a developer!");

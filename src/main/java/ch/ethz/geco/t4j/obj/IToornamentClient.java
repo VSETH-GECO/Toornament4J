@@ -1,7 +1,7 @@
 package ch.ethz.geco.t4j.obj;
 
 import ch.ethz.geco.t4j.internal.FeaturedTournamentFilter;
-import ch.ethz.geco.t4j.util.ToornamentException;
+import ch.ethz.geco.t4j.util.Toornament4JException;
 
 import java.util.List;
 
@@ -34,9 +34,9 @@ public interface IToornamentClient {
      * @param from The number of the first discipline to request, inclusive.
      * @param to   The number of the last discipline to request, inclusive.
      * @return A list of available disciplines.
-     * @throws ToornamentException If the requested range was too big (> 50).
+     * @throws Toornament4JException If the requested range was too big (> 50).
      */
-    List<IDiscipline> getDisciplines(int from, int to) throws ToornamentException;
+    List<IDiscipline> getDisciplines(int from, int to) throws Toornament4JException;
 
     /**
      * Gets a discipline by its ID.
@@ -53,9 +53,9 @@ public interface IToornamentClient {
      * @param from The number of the first tournament to request, inclusive.
      * @param to   The number of the last tournament to request, inclusive.
      * @return A list of featured tournaments.
-     * @throws ToornamentException If the requested range was too big (> 50).
+     * @throws Toornament4JException If the requested range was too big (> 50).
      */
-    List<ITournament> getFeaturedTournaments(int from, int to) throws ToornamentException;
+    List<ITournament> getFeaturedTournaments(int from, int to) throws Toornament4JException;
 
     /**
      * Gets a list of filtered tournaments. Note that you can only request
@@ -67,9 +67,9 @@ public interface IToornamentClient {
      * @param to     The number of the last tournament to request, inclusive.
      * @param filter The filter that should be applied, or null for no filter.
      * @return A list of filtered tournaments.
-     * @throws ToornamentException If the requested range was too big (> 50).
+     * @throws Toornament4JException If the requested range was too big (> 50).
      */
-    List<ITournament> getFeaturedTournaments(int from, int to, FeaturedTournamentFilter filter) throws ToornamentException;
+    List<ITournament> getFeaturedTournaments(int from, int to, FeaturedTournamentFilter filter) throws Toornament4JException;
 
     /**
      * Gets a tournament by its ID.

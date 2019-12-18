@@ -11,7 +11,7 @@ import ch.ethz.geco.t4j.obj.IDiscipline;
 import ch.ethz.geco.t4j.obj.IPlaylist;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
 import ch.ethz.geco.t4j.obj.ITournament;
-import ch.ethz.geco.t4j.util.ToornamentException;
+import ch.ethz.geco.t4j.util.Toornament4JException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -79,9 +79,9 @@ public class ToornamentClient implements IToornamentClient {
     }
 
     @Override
-    public List<IDiscipline> getDisciplines(int from, int to) throws ToornamentException {
+    public List<IDiscipline> getDisciplines(int from, int to) throws Toornament4JException {
         if (to - from >= 50)
-            throw new ToornamentException("Range too big, you can only request 50 disciplines at once.");
+            throw new Toornament4JException("Range too big, you can only request 50 disciplines at once.");
 
         List<DisciplineObject> disciplineObjects = REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/disciplines",
                 new TypeReference<List<DisciplineObject>>() {
@@ -103,14 +103,14 @@ public class ToornamentClient implements IToornamentClient {
     }
 
     @Override
-    public List<ITournament> getFeaturedTournaments(int from, int to) throws ToornamentException {
+    public List<ITournament> getFeaturedTournaments(int from, int to) throws Toornament4JException {
         return getFeaturedTournaments(from, to, null);
     }
 
     @Override
-    public List<ITournament> getFeaturedTournaments(int from, int to, FeaturedTournamentFilter filter) throws ToornamentException {
+    public List<ITournament> getFeaturedTournaments(int from, int to, FeaturedTournamentFilter filter) throws Toornament4JException {
         if (to - from >= 50)
-            throw new ToornamentException("Range too big, you can only request 50 disciplines at once.");
+            throw new Toornament4JException("Range too big, you can only request 50 disciplines at once.");
 
         String queryString = "";
 

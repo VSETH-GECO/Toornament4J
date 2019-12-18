@@ -1,5 +1,8 @@
 package ch.ethz.geco.t4j.internal.json;
 
+import reactor.util.annotation.NonNull;
+import reactor.util.annotation.Nullable;
+
 import java.util.List;
 
 /**
@@ -9,10 +12,15 @@ public class ErrorObject {
     public List<SingleErrorObject> errors;
 
     public static class SingleErrorObject {
-        public String message;
-        public String scope;
+        @NonNull
+        public String message = "";
+        @NonNull
+        public String scope = "";
+        @Nullable
         public String property_path;
+        @Nullable
         public String invalid_value;
+        @Nullable
         public String type;
     }
 }

@@ -7,7 +7,7 @@ import ch.ethz.geco.t4j.internal.json.TournamentObject;
 import ch.ethz.geco.t4j.obj.IPlaylist;
 import ch.ethz.geco.t4j.obj.IToornamentClient;
 import ch.ethz.geco.t4j.obj.ITournament;
-import ch.ethz.geco.t4j.util.ToornamentException;
+import ch.ethz.geco.t4j.util.Toornament4JException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -50,9 +50,9 @@ public class Playlist implements IPlaylist {
     }
 
     @Override
-    public List<ITournament> getTournaments(int from, int to) throws ToornamentException {
+    public List<ITournament> getTournaments(int from, int to) throws Toornament4JException {
         if (to - from >= 50)
-            throw new ToornamentException("Range too big, you can only request 50 disciplines at once.");
+            throw new Toornament4JException("Range too big, you can only request 50 disciplines at once.");
 
         List<TournamentObject> tournamentObjects = REQUESTS.GET.makeRequest(Endpoints.VIEWER + "/playlist/" + id + "/tournaments",
                 new TypeReference<List<TournamentObject>>() {

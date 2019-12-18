@@ -8,13 +8,13 @@ A: Account
 
 Endpoints per Object:
 Client:
-    V:Disciplines: GET/disciplines
-    V:Disciplines: GET/disciplines/{id}
-    V:Playlists: GET/playlists/{id}
-    V:Tournaments: GET/tournaments/featured
-    V:Tournaments: GET/tournaments/{id}
-    P:Disciplines: GET/disciplines
-    P:Disciplines: GET/disciplines/{id}
+    V:Disciplines: GET/disciplines                      MATCHES O/P:Disciplines
+    V:Disciplines: GET/disciplines/{id}                 MATCHES O/P:Disciplines
+    V:Playlists: GET/playlists/{id}                     UNIQUE
+    V:Tournaments: GET/tournaments/featured             UNIQUE
+    V:Tournaments: GET/tournaments/{id}                 +O >= P >= V
+    P:Disciplines: GET/disciplines                      MATCHES O/V:Disciplines
+    P:Disciplines: GET/disciplines/{id}                 MATCHES O/V:Disciplines
   * P:Participants: GET/me/participants
   * P:Participants: GET/me/participants/{id}
   * P:Participants: PATCH/me/participants/{id}
@@ -22,12 +22,12 @@ Client:
   * P:Participants: POST/me/registrations
   * P:Participants: GET/me/registrations/{id}
   * P:Participants: PATCH/me/registrations/{id}
-    P:Participants: GET/tournaments/{id}
-    O:Disciplines: GET/disciplines
-    O:Disciplines: GET/disciplines/{id}
-  + O:Tournaments: GET/tournaments
+    P:Participants: GET/tournaments/{id}                +O >= P >= V
+    O:Disciplines: GET/disciplines                      MATCHES V/P:Disciplines
+    O:Disciplines: GET/disciplines/{id}                 MATCHES V/P:Disciplines
+  + O:Tournaments: GET/tournaments                      +O >= P >= V
   + O:Tournaments: POST/tournaments
-  + O:Tournaments: GET/tournaments/{id}
+  + O:Tournaments: GET/tournaments/{id}                 +O >= P >= V
   + O:Tournaments: PATCH/tournaments/{id}
   + O:Tournaments: DELETE/tournaments/{id}
   + O:Webhooks: GET/webhooks
